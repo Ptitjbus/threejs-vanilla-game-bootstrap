@@ -1,0 +1,30 @@
+{
+  "name": "threejs-vanilla-game-bootstrap",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "vite"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "prettier": "3.6.2"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@pmndrs/vanilla": "^1.24.1",
+    "@tailwindcss/vite": "^4.1.13",
+    "@vercel/analytics": "^1.5.0",
+    "@vercel/speed-insights": "^1.2.0",
+    "cannon-es": "^0.20.0",
+    "howler": "^2.2.4",
+    "lil-gui": "^0.20.0",
+    "tailwindcss": "^4.1.13",
+    "three": "^0.180.0",
+    "three-custom-shader-material": "^6.3.7",
+    "vite": "^7.1.5",
+    "vite-plugin-restart": "^1.0.0"
+  }
+}

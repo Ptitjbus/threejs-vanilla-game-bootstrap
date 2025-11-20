@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>ThreeJS Vanilla Game Bootstrap</title>
+        <link rel="stylesheet" href="./style.css" />
+        <link rel="icon" type="image/x-icon" href="./favicon.ico" />
+        <link rel="icon" type="image/png" href="./favicon.png" />
+    </head>
+    <body class="bg-black">
+        <!-- Container spécial pour mobile/tablette -->
+        <div
+            class="lg:hidden absolute inset-0 flex justify-center items-center h-full w-full p-10 bg-black"
+        >
+            <p data-i18n="mobileMessage" class="text-white text-xl text-center">
+                Cette expérience est disponible uniquement sur ordinateur
+            </p>
+        </div>
+
+        <!-- Contenu desktop (masqué sur mobile/tablette) -->
+        <div class="max-lg:hidden">
+            <div
+                id="loading-bar"
+                class="fixed top-0 left-0 w-0 h-[5px] bg-white pointer-events-none z-[1001] transition-all duration-300 ease"
+            ></div>
+            <canvas
+                id="webgl"
+                class="fixed inset-0 outline-none opacity-0 transition-opacity duration-[1.5s]"
+            ></canvas>
+
+            <div
+                id="video-loading-container"
+                class="fixed inset-0 w-full h-full z-[1000] bg-black flex flex-col items-center justify-center"
+            >
+                <video
+                    id="intro-video"
+                    playsinline
+                    muted
+                    class="w-full h-full object-cover"
+                ></video>
+                <button
+                    id="skip-video-btn"
+                    class="absolute bottom-20 right-20 opacity-0 text-white font-medium text-base uppercase cursor-pointer transition-all duration-300 hover:opacity-70 justify-self-start"
+                    disabled
+                    data-i18n="skipIntroButton"
+                >
+                    Passer l'introduction
+                </button>
+                <div
+                    id="click-to-play-overlay"
+                    class="absolute inset-0 w-full h-full bg-black/50 text-white text-center flex items-center justify-center select-none"
+                    data-i18n="clickToPlayVideo"
+                ></div>
+            </div>
+
+            <div
+                id="start-overlay"
+                class="bg-black/70 backdrop-blur-sm fixed inset-0 flex flex-col justify-center items-center z-[1] transition-opacity duration-300 ease-in"
+            >
+                <button
+                    class="px-20 py-4 rounded-md bg-white text-black font-medium text-lg"
+                    id="start-experience-btn"
+                >
+                    <span data-i18n="startExperience"
+                        >Débuter l'expérience</span
+                    >
+                </button>
+            </div>
+
+            <!-- Page des options -->
+            <div
+                class="fixed inset-0 bg-black/80 flex flex-col items-center z-[200] justify-start pt-20 px-5 pb-[150px] transition-opacity duration-[1.5s] backdrop-blur-[5px] hidden"
+                id="options-overlay"
+            >
+                <div
+                    class="flex flex-col justify-start items-center max-w-[600px] w-full"
+                >
+                    <div class="mb-[50px] text-center">
+                        <h1
+                            data-i18n="optionsTitle"
+                            class="font-['rafaella',sans-serif] font-normal text-white text-[60px] tracking-[4px] m-0"
+                        >
+                            Options
+                        </h1>
+                    </div>
+
+                    <div class="flex flex-col gap-[30px] w-full">
+                        <h3
+                            data-i18n="soundTitle"
+                            class="font-['montserrat',sans-serif] font-medium text-base uppercase mb-[15px] text-white/60 underline text-center"
+                        >
+                            son
+                        </h3>
+                        <div
+                            class="flex items-center justify-between text-white font-['montserrat',sans-serif] p-0"
+                        >
+                            <label
+                                for="music-volume"
+                                data-i18n="musicVolumeLabel"
+                                class="text-white/60 font-medium text-base min-w-[200px]"
+                                >Volume musique</label
+                            >
+                            <input
+                                type="range"
+                                id="music-volume"
+                                min="0"
+                                max="100"
+                                value="50"
+                                class="appearance-none w-[200px] h-[6px] bg-white/30 outline-none rounded-[3px] mx-[15px] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-[#333] [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-[#333]"
+                            />
+                            <span
+                                class="font-['montserrat',sans-serif] font-medium text-xl text-white min-w-[50px] text-right"
+                                >50%</span
+                            >
+                        </div>
+
+                        <div
+                            class="flex items-center justify-between text-white font-['montserrat',sans-serif] p-0"
+                        >
+                            <label
+                                for="sfx-volume"
+                                data-i18n="sfxVolumeLabel"
+                                class="text-white/60 font-medium text-base min-w-[200px]"
+                                >Volume effets sonores</label
+                            >
+                            <input
+                                type="range"
+                                id="sfx-volume"
+                                min="0"
+                                max="100"
+                                value="70"
+                                class="appearance-none w-[200px] h-[6px] bg-white/30 outline-none rounded-[3px] mx-[15px] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-[#333] [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-[#333]"
+                            />
+                            <span
+                                class="font-['montserrat',sans-serif] font-medium text-xl text-white min-w-[50px] text-right"
+                                >70%</span
+                            >
+                        </div>
+
+                        <h3
+                            data-i18n="graphicsTitle"
+                            class="font-['montserrat',sans-serif] font-medium text-base uppercase mb-[15px] text-white/60 underline text-center"
+                        >
+                            graphisme
+                        </h3>
+                        <div
+                            class="flex items-center justify-between text-white font-['montserrat',sans-serif] p-0"
+                        >
+                            <label
+                                for="graphics-quality"
+                                data-i18n="performanceModeLabel"
+                                class="text-white/60 font-medium text-base min-w-[200px]"
+                                >Mode performance</label
+                            >
+                            <div
+                                class="relative flex bg-white/10 border border-white/30 p-1 overflow-hidden w-[60px] h-[30px]"
+                                data-active="false"
+                            >
+                                <span
+                                    class="relative w-1/2 cursor-pointer transition-colors duration-300 z-[2] text-[0] text-transparent"
+                                    data-value="false"
+                                ></span>
+                                <span
+                                    class="relative w-1/2 cursor-pointer transition-colors duration-300 z-[2] text-[0] text-transparent"
+                                    data-value="true"
+                                ></span>
+                                <div
+                                    class="absolute top-1 left-1 h-[calc(100%-8px)] w-[calc(50%-4px)] bg-white rounded-[2px] transition-transform duration-300 z-[1]"
+                                ></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    class="fixed bottom-[30px] left-0 w-full grid grid-cols-[1fr_auto_1fr] items-center px-10 box-border"
+                >
+                    <button
+                        class="bg-transparent border-none text-white py-3 px-5 font-['montserrat',sans-serif] font-medium text-base uppercase cursor-pointer transition-all duration-300 hover:opacity-70 justify-self-start"
+                        id="back-options-btn"
+                        data-i18n="backButton"
+                    >
+                        retour
+                    </button>
+                </div>
+            </div>
+
+            <!-- Rooms titles -->
+            <div
+                class="fixed w-4/5 top-[40%] left-1/2 -translate-x-1/2 -translate-y-1/2 z-[1000] opacity-0 blur-[5px] transition-[opacity_1.43s_cubic-bezier(0.4,0,0.2,1),filter_1.43s_cubic-bezier(0.4,0,0.2,1),transform_1.43s_cubic-bezier(0.4,0,0.2,1)] pointer-events-none select-none text-center font-['rafaella',sans-serif] font-normal text-white text-[40px] tracking-[4px]"
+                id="room-title-container"
+            >
+                <video></video>
+                <h1
+                    class="font-['rafaella',sans-serif] font-normal text-white text-[40px] tracking-[4px]"
+                    id="room-title"
+                ></h1>
+            </div>
+
+            <!-- Container pour les dialogues -->
+            <div id="dialog-container"></div>
+            <!-- Template pour les popins/dialogues -->
+            <template id="dialog-template">
+                <dialog
+                    class="fixed top-[15%] left-[calc(50%-225px)] w-[450px] h-[160px] bg-transparent bg-[url('/images/popins/background.svg')] bg-no-repeat bg-cover p-5 border border-white opacity-0 scale-[0.95] translate-y-[30px] transition-[opacity_0.4s_cubic-bezier(0.4,0,0.2,1),transform_0.4s_cubic-bezier(0.4,0,0.2,1)] pointer-events-none font-['pf-videotext',sans-serif] font-normal select-none box-border overflow-hidden flex flex-col items-center justify-center relative"
+                >
+                    <div class="flex justify-center items-center mb-[5px]">
+                        <img
+                            src="/images/logos/sea_shepherd_logo.svg"
+                            alt="Logo Sea Shepherd"
+                            class="w-[60px] h-[60px] object-contain mb-[5px] relative z-[3]"
+                        />
+                    </div>
+                    <h3
+                        class="text-xs font-semibold text-white mb-[5px] uppercase relative z-[3]"
+                    ></h3>
+                    <div
+                        class="text-sm text-center text-white uppercase leading-[1.3] relative z-[3]"
+                    ></div>
+                </dialog>
+            </template>
+
+            <div
+                id="keys-tutorial-container"
+                class="fixed w-full top-[8%] left-0 opacity-0 flex flex-col items-center justify-center gap-8 transition-all duration-300 ease-out"
+            >
+                <div
+                    class="relative text-white font-['montserrat',sans-serif] py-[15px] px-6 font-medium text-[2em] border border-white cursor-pointer transition-all duration-300 select-none text-center outline-none flex gap-4 items-center justify-center bg-[rgba(0,21,68,0.5)] min-w-[400px] backdrop-blur-[10px]"
+                >
+                    <span data-i18n="pressText">Pressez</span>
+                    <div
+                        class="flex items-center justify-center w-[30px] h-[30px] border-2 border-white bg-white/10 font-['montserrat',sans-serif] text-center leading-none font-medium text-xl"
+                        data-key="z"
+                    >
+                        Z
+                    </div>
+                    <div
+                        class="flex items-center justify-center w-[30px] h-[30px] border-2 border-white bg-white/10 font-['montserrat',sans-serif] text-center leading-none font-medium text-xl"
+                        data-key="q"
+                    >
+                        Q
+                    </div>
+                    <div
+                        class="flex items-center justify-center w-[30px] h-[30px] border-2 border-white bg-white/10 font-['montserrat',sans-serif] text-center leading-none font-medium text-xl"
+                        data-key="s"
+                    >
+                        S
+                    </div>
+                    <div
+                        class="flex items-center justify-center w-[30px] h-[30px] border-2 border-white bg-white/10 font-['montserrat',sans-serif] text-center leading-none font-medium text-xl"
+                        data-key="d"
+                    >
+                        D
+                    </div>
+                    <span data-i18n="toMoveText">pour bouger</span>
+                </div>
+            </div>
+
+            <div
+                id="mouse-tutorial-container"
+                class="fixed w-full top-[8%] left-0 opacity-0 flex flex-col items-center justify-center gap-8 transition-all duration-300 ease-out"
+            >
+                <div
+                    class="relative text-white font-['montserrat',sans-serif] py-[15px] px-6 font-medium text-[2em] border border-white cursor-pointer transition-all duration-300 select-none text-center outline-none flex gap-4 items-center justify-center bg-[rgba(0,21,68,0.5)] min-w-[400px] backdrop-blur-[10px]"
+                >
+                    <span data-i18n="mouseTutorialText"
+                        >Déplacez la souris pour regarder autour de vous</span
+                    >
+                </div>
+            </div>
+
+            <!-- Template pour les choix -->
+            <div
+                id="choices-container"
+                class="fixed w-full bottom-[160px] left-0 flex flex-col items-center gap-8"
+            >
+                <h2
+                    id="choices-title"
+                    class="font-['montserrat',sans-serif] font-medium text-xl text-white text-center bg-black/50 py-[10px] px-5"
+                ></h2>
+                <div id="choices-buttons-container" class="flex gap-[42px]">
+                    <div id="dialog-button-1">
+                        <button
+                            class="relative text-white font-['montserrat',sans-serif] py-[15px] px-6 font-medium text-[2em] border border-white cursor-pointer transition-all duration-300 select-none text-center outline-none flex gap-4 items-center justify-center bg-[rgba(0,21,68,0.5)] min-w-[400px] backdrop-blur-[10px]"
+                        >
+                            <div
+                                class="flex items-center justify-center w-[30px] h-[30px] border-2 border-white bg-white/10 font-['montserrat',sans-serif] text-center leading-none font-medium text-xl"
+                            >
+                                U
+                            </div>
+                            <span class="text-white"></span>
+                        </button>
+                    </div>
+                    <div id="dialog-button-2">
+                        <button
+                            class="relative text-white font-['montserrat',sans-serif] py-[15px] px-6 font-medium text-[2em] border border-white cursor-pointer transition-all duration-300 select-none text-center outline-none flex gap-4 items-center justify-center bg-[rgba(0,21,68,0.5)] min-w-[400px] backdrop-blur-[10px]"
+                        >
+                            <div
+                                class="flex items-center justify-center w-[30px] h-[30px] border-2 border-white bg-white/10 font-['montserrat',sans-serif] text-center leading-none font-medium text-xl"
+                            >
+                                I
+                            </div>
+                            <span class="text-white"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Container pour les sous-titres -->
+            <div
+                id="subtitle-container"
+                class="absolute bottom-[10%] left-1/2 -translate-x-1/2 bg-black/50 text-white py-[10px] px-5 rounded-md font-sans text-center max-w-[80%] z-[1000] hidden text-base leading-[1.4] backdrop-blur-[2px] border-none"
+            ></div>
+        </div>
+
+        <script type="module" src="./script.js"></script>
+    </body>
+</html>
